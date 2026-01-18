@@ -1,0 +1,129 @@
+---
+const year = new Date().getFullYear();
+
+// Optional: set real social links in .env (or delete this block entirely)
+const socials = [
+  { label: "X (Twitter)", href: import.meta.env.PUBLIC_X_URL, svgPath: "M18.244 2H21l-6.52 7.45L22 22h-6.8l-5.33-6.96L3.8 22H1l7.05-8.05L2 2h6.97l4.82 6.26L18.244 2z" },
+  { label: "Facebook", href: import.meta.env.PUBLIC_FACEBOOK_URL, svgPath: "M22 12a10 10 0 1 0-11.5 9.9v-7H8v-3h2.5V9.5A3.5 3.5 0 0 1 14.2 6h2.3v3h-2.3c-.7 0-1.2.5-1.2 1.2V12H16.5l-.5 3H13v7A10 10 0 0 0 22 12z" },
+].filter((s) => typeof s.href === "string" && s.href.length > 0);
+---
+
+<footer class="bg-gray-900 text-white relative overflow-hidden">
+  <!-- Background pattern -->
+  <div class="absolute inset-0 opacity-10 pointer-events-none">
+    <div class="absolute top-4 left-4 text-4xl">⚽</div>
+    <div class="absolute top-6 right-6 text-3xl">🏆</div>
+    <div class="absolute bottom-6 left-6 text-3xl">🥅</div>
+    <div class="absolute bottom-4 right-4 text-3xl">⚽</div>
+  </div>
+
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <!-- About -->
+      <div>
+        <h3 class="text-lg font-semibold mb-3 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+          Football Central
+        </h3>
+        <p class="text-gray-400 text-sm leading-relaxed mb-4">
+          Evergreen football analysis, rankings, and opinion — built for fans who love the details.
+        </p>
+
+        {socials.length > 0 && (
+          <div class="flex items-center gap-3" aria-label="Social links">
+            {socials.map((s) => (
+              <a
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-gray-400 hover:text-white transition-colors duration-200"
+                aria-label={s.label}
+                title={s.label}
+              >
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d={s.svgPath}></path>
+                </svg>
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <!-- Categories -->
+      <div>
+        <h3 class="text-base font-semibold mb-3 text-white">Categories</h3>
+        <ul class="space-y-2 text-sm">
+          <li>
+            <a href="/category/analysis" class="text-gray-400 hover:text-green-400 transition-colors duration-200 flex items-center">
+              <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+              📊 Analysis
+            </a>
+          </li>
+          <li>
+            <a href="/category/rankings" class="text-gray-400 hover:text-yellow-400 transition-colors duration-200 flex items-center">
+              <span class="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span>
+              🏆 Rankings
+            </a>
+          </li>
+          <li>
+            <a href="/category/opinion" class="text-gray-400 hover:text-purple-400 transition-colors duration-200 flex items-center">
+              <span class="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
+              💭 Opinion
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Useful links -->
+      <div>
+        <h3 class="text-base font-semibold mb-3 text-white">Explore</h3>
+        <ul class="space-y-2 text-sm">
+          <li><a href="/blog" class="text-gray-400 hover:text-white transition-colors duration-200">All Articles</a></li>
+          <li><a href="/blog" class="text-gray-400 hover:text-white transition-colors duration-200">Latest Posts</a></li>
+          <li><a href="/sitemap.xml" class="text-gray-400 hover:text-white transition-colors duration-200">Sitemap</a></li>
+        </ul>
+      </div>
+
+      <!-- Newsletter (launch-day safe) -->
+      <div>
+        <h3 class="text-base font-semibold mb-3 text-white">Get Updates</h3>
+        <p class="text-gray-400 text-sm mb-3">
+          New posts, no spam. If you’re launching today, this can be a simple email link.
+        </p>
+
+        <form
+          action="mailto:footballcentral@example.com"
+          method="post"
+          enctype="text/plain"
+          class="flex gap-2"
+        >
+          <input
+            type="email"
+            name="email"
+            required
+            placeholder="you@example.com"
+            class="flex-1 px-3 py-2 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          <button
+            type="submit"
+            class="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all font-semibold"
+          >
+            Join
+          </button>
+        </form>
+
+        <p class="text-xs text-gray-500 mt-3">
+          By subscribing, you agree to our <a class="underline hover:text-white" href="/privacy">Privacy Policy</a>.
+        </p>
+      </div>
+    </div>
+
+    <div class="border-t border-gray-800 mt-8 pt-5 text-center text-xs text-gray-400 space-y-2">
+      <p>
+        © {year} Football Central. All rights reserved.
+      </p>
+      <p class="text-gray-500">
+        Football Central is an independent publication and is not affiliated with any club, league, or governing body.
+      </p>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,193 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout 
+  title="Contact Us - Football Central"
+  description="Get in touch with Football Central. We'd love to hear from you about football analysis, feedback, or collaboration opportunities."
+>
+  <Header />
+  
+  <main>
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-16">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl md:text-6xl font-bold mb-6">Contact Us</h1>
+        <p class="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto">
+          We'd love to hear from you. Get in touch with questions, feedback, or collaboration ideas.
+        </p>
+      </div>
+    </section>
+
+    <!-- Contact Content -->
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="grid lg:grid-cols-2 gap-16">
+        
+        <!-- Contact Form -->
+        <div>
+          <h2 class="text-3xl font-bold text-gray-900 mb-8">Send Us a Message</h2>
+          
+          <form class="space-y-6" action="#" method="POST">
+            <div>
+              <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                Full Name *
+              </label>
+              <input 
+                type="text" 
+                id="name" 
+                name="name" 
+                required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                placeholder="Your full name"
+              />
+            </div>
+            
+            <div>
+              <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                Email Address *
+              </label>
+              <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                placeholder="your.email@example.com"
+              />
+            </div>
+            
+            <div>
+              <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">
+                Subject *
+              </label>
+              <select 
+                id="subject" 
+                name="subject" 
+                required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              >
+                <option value="">Select a subject</option>
+                <option value="general">General Inquiry</option>
+                <option value="feedback">Feedback</option>
+                <option value="collaboration">Collaboration</option>
+                <option value="guest-post">Guest Post Proposal</option>
+                <option value="correction">Content Correction</option>
+                <option value="advertising">Advertising Inquiry</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            
+            <div>
+              <label for="message" class="block text-sm font-medium text-gray-700 mb-2">
+                Message *
+              </label>
+              <textarea 
+                id="message" 
+                name="message" 
+                rows="6" 
+                required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-vertical"
+                placeholder="Tell us what's on your mind..."
+              ></textarea>
+            </div>
+            
+            <button 
+              type="submit"
+              class="w-full bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition transform hover:scale-105"
+            >
+              Send Message
+            </button>
+          </form>
+          
+          <p class="text-sm text-gray-600 mt-4">
+            * Required fields. We typically respond within 24-48 hours.
+          </p>
+        </div>
+        
+        <!-- Contact Information -->
+        <div>
+          <h2 class="text-3xl font-bold text-gray-900 mb-8">Get In Touch</h2>
+          
+          <div class="space-y-8">
+            <div class="bg-gray-50 rounded-lg p-6">
+              <h3 class="text-xl font-semibold text-gray-900 mb-4">Contact Information</h3>
+              <div class="space-y-4">
+                <div class="flex items-center">
+                  <div class="text-blue-600 mr-4">📧</div>
+                  <div>
+                    <p class="font-medium text-gray-900">Email</p>
+                    <p class="text-gray-600">contact@footballcentral.com</p>
+                  </div>
+                </div>
+                
+                <div class="flex items-center">
+                  <div class="text-blue-600 mr-4">⏰</div>
+                  <div>
+                    <p class="font-medium text-gray-900">Response Time</p>
+                    <p class="text-gray-600">24-48 hours</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-blue-50 rounded-lg p-6">
+              <h3 class="text-xl font-semibold text-gray-900 mb-4">What We'd Love to Hear About</h3>
+              <ul class="space-y-3 text-gray-700">
+                <li class="flex items-start">
+                  <span class="text-green-600 mr-3">✓</span>
+                  <span>Feedback on our articles and analysis</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="text-green-600 mr-3">✓</span>
+                  <span>Suggestions for topics you'd like us to cover</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="text-green-600 mr-3">✓</span>
+                  <span>Guest post proposals (with writing samples)</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="text-green-600 mr-3">✓</span>
+                  <span>Collaboration opportunities</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="text-green-600 mr-3">✓</span>
+                  <span>Questions about football tactics or history</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div class="bg-yellow-50 rounded-lg p-6">
+              <h3 class="text-xl font-semibold text-gray-900 mb-4">Our Commitment</h3>
+              <p class="text-gray-700 mb-4">
+                We read every message personally and respond to all legitimate inquiries. 
+                While we can't guarantee we'll cover every suggested topic, we genuinely 
+                appreciate your input and use it to guide our content strategy.
+              </p>
+              <p class="text-gray-700">
+                For urgent corrections to published content, please use "Content Correction" 
+                as your subject line, and we'll prioritize your message.
+              </p>
+            </div>
+            
+            <div class="text-center">
+              <h3 class="text-xl font-semibold text-gray-900 mb-4">Follow Our Journey</h3>
+              <p class="text-gray-700 mb-6">
+                Stay updated with our latest articles and behind-the-scenes insights.
+              </p>
+              <a 
+                href="/blog" 
+                class="inline-flex items-center bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+              >
+                Read Our Blog →
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <Footer />
+</Layout>

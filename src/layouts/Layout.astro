@@ -1,0 +1,85 @@
+---
+import "../styles/global.css";
+
+export interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  canonical?: string; // can be full url or path
+}
+
+const {
+  title,
+  description = "Football Central: analysis, rankings, and evergreen football insights.",
+  image = "/og-image.jpg",
+  canonical,
+} = Astro.props;
+
+const site = Astro.site;
+
+const canonicalURL = site
+  ? (canonical ? new URL(canonical, site) : new URL(Astro.url.pathname, site))
+  : undefined;
+
+const ogImageURL = site ? new URL(image, site) : undefined;
+
+const adClient = import.meta.env.PUBLIC_ADSENSE_CLIENT;
+const adsEnabled = import.meta.env.PROD && !!adClient;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content="index,follow" />
+    <meta name="generator" content={Astro.generator} />
+
+    {canonicalURL && <link rel="canonical" href={canonicalURL} />}
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    {canonicalURL && <meta property="og:url" content={canonicalURL.toString()} />}
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {ogImageURL && <meta property="og:image" content={ogImageURL.toString()} />}
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    {canonicalURL && <meta name="twitter:url" content={canonicalURL.toString()} />}
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {ogImageURL && <meta name="twitter:image" content={ogImageURL.toString()} />}
+
+    <!-- AdSense: load once globally (prod only, client must be set) -->
+    {adsEnabled && (
+      <script
+        async
+        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adClient}`}
+        crossorigin="anonymous"
+      />
+    )}
+
+    {site && (
+      <script
+        type="application/ld+json"
+        set:html={JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "Football Central",
+          url: site.toString(),
+        })}
+      />
+    )}
+  </head>
+
+  <body class="text-gray-900 min-h-screen">
+    <div class="fixed inset-0 -z-10 bg-gradient-to-br from-white to-slate-100"></div>
+    <slot />
+  </body>
+</html>

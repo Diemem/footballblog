@@ -1,0 +1,257 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import AdSlot from "../../components/AdSlot.astro";
+import { slugify } from "../../utils/slugify";
+
+// Fixed Tailwind class mapping (no dynamic class strings)
+const CATEGORY_STYLES: Record<
+  string,
+  { emoji: string; gradient: string; pillText: string; pillBg: string }
+> = {
+  analysis: {
+    emoji: "📊",
+    gradient: "from-green-600 to-green-700",
+    pillText: "text-green-700",
+    pillBg: "bg-green-50",
+  },
+  rankings: {
+    emoji: "🏆",
+    gradient: "from-yellow-600 to-yellow-700",
+    pillText: "text-yellow-700",
+    pillBg: "bg-yellow-50",
+  },
+  opinion: {
+    emoji: "💭",
+    gradient: "from-purple-600 to-purple-700",
+    pillText: "text-purple-700",
+    pillBg: "bg-purple-50",
+  },
+};
+
+const getCategoryStyle = (categoryName: string) => {
+  const key = slugify(categoryName);
+  return (
+    CATEGORY_STYLES[key] ?? {
+      emoji: "⚽",
+      gradient: "from-blue-600 to-blue-700",
+      pillText: "text-blue-700",
+      pillBg: "bg-blue-50",
+    }
+  );
+};
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection("posts");
+  const categoryNames = [...new Set(allPosts.map((p) => p.data.category))];
+
+  return categoryNames.map((name) => ({
+    params: { category: slugify(name) },
+    props: { categoryName: name },
+  }));
+}
+
+const { categoryName } = Astro.props;
+const categorySlug = slugify(categoryName);
+
+const allPosts = await getCollection("posts");
+
+// Match by slug (safe if stored category has caps/spaces)
+const posts = allPosts
+  .filter((p) => slugify(p.data.category) === categorySlug)
+  .sort(
+    (a, b) =>
+      new Date(b.data.publishedAt).getTime() - new Date(a.data.publishedAt).getTime()
+  );
+
+const allCategories = [...new Set(allPosts.map((p) => p.data.category))];
+
+const style = getCategoryStyle(categoryName);
+
+const avgRead =
+  posts.length > 0
+    ? Math.round(posts.reduce((acc, p) => acc + p.data.readTime, 0) / posts.length)
+    : 0;
+---
+
+<Layout
+  title={`${categoryName} - Football Central`}
+  description={`Latest ${categoryName} news, insights, and expert commentary.`}
+  canonical={`/category/${categorySlug}`}
+>
+  <Header />
+
+  <main>
+    <!-- Hero Section -->
+    <section class="relative py-20 overflow-hidden">
+      <div
+        class="absolute inset-0"
+        style="background-image: url('/images/pexels-eric-masengesho-2154894489-33471345.jpg'); background-size: cover; background-position: center;"
+      ></div>
+      <div class={`absolute inset-0 bg-gradient-to-r ${style.gradient} opacity-80`}></div>
+
+      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-8">
+          <div class="flex items-center justify-center space-x-4 mb-6">
+            <div class="text-6xl animate-bounce">{style.emoji}</div>
+            <h1 class="text-4xl md:text-6xl font-bold text-white drop-shadow-lg">
+              {categoryName}
+            </h1>
+            <div class="text-6xl animate-bounce" style="animation-delay: 0.5s;">
+              {style.emoji}
+            </div>
+          </div>
+
+          <p class="text-xl md:text-2xl text-gray-100 drop-shadow-md mb-6">
+            Latest {categoryName.toLowerCase()} news, insights, and expert commentary
+          </p>
+
+          <!-- Stats -->
+          <div class="flex flex-wrap justify-center gap-6 mb-8">
+            <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg px-6 py-4">
+              <div class="text-3xl font-bold text-white">{posts.length}</div>
+              <div class="text-gray-200">Articles</div>
+            </div>
+            <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg px-6 py-4">
+              <div class="text-3xl font-bold text-white">
+                {posts.filter((p) => p.data.featured).length}
+              </div>
+              <div class="text-gray-200">Featured</div>
+            </div>
+            <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg px-6 py-4">
+              <div class="text-3xl font-bold text-white">{avgRead}</div>
+              <div class="text-gray-200">Avg Read</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Navigation -->
+        <div class="flex flex-wrap justify-center gap-3">
+          <a
+            href="/blog"
+            class="bg-white text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition-all duration-200 shadow-lg"
+          >
+            All Posts
+          </a>
+
+          {allCategories.map((cat) => {
+            const isActive = slugify(cat) === categorySlug;
+            const catStyle = getCategoryStyle(cat);
+
+            return (
+              <a
+                href={`/category/${slugify(cat)}`}
+                class={isActive
+                  ? "bg-white text-gray-700 px-6 py-3 rounded-lg font-medium shadow-lg"
+                  : "bg-white bg-opacity-20 text-white px-6 py-3 rounded-lg font-medium hover:bg-opacity-30 transition-all duration-200 backdrop-blur-sm shadow-lg"}
+              >
+                <span class="flex items-center">
+                  <span class="mr-2">{catStyle.emoji}</span>
+                  {cat}
+                </span>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+
+    <!-- Breadcrumb -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <nav class="text-sm bg-white bg-opacity-90 backdrop-blur-sm rounded-lg px-4 py-2 shadow-sm">
+        <a href="/" class="text-blue-600 hover:text-blue-700 transition-colors">Home</a>
+        <span class="mx-2 text-gray-500">/</span>
+        <a href="/blog" class="text-blue-600 hover:text-blue-700 transition-colors">Blog</a>
+        <span class="mx-2 text-gray-500">/</span>
+        <span class="text-gray-500 font-medium">{categoryName}</span>
+      </nav>
+    </div>
+
+    <!-- Ad Slot (USE NUMERIC SLOT IDs) -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <AdSlot slot="1234567890" height={250} className="my-8" />
+    </div>
+
+    <!-- Posts Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="flex items-center justify-between mb-8 flex-wrap gap-4">
+        <div class="flex items-center space-x-3">
+          <div class="text-3xl">{style.emoji}</div>
+          <h2 class="text-3xl font-bold text-gray-900">
+            {posts.length} {posts.length === 1 ? "Article" : "Articles"} in {categoryName}
+          </h2>
+        </div>
+      </div>
+
+      {posts.length > 0 ? (
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {posts.map((post) => (
+            <article class="group bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+              {post.data.featuredImage ? (
+                <img
+                  src={post.data.featuredImage}
+                  alt={post.data.title}
+                  class="w-full h-48 object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <div class="h-48 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center relative overflow-hidden">
+                  <div class="text-6xl text-blue-300">⚽</div>
+                </div>
+              )}
+
+              <div class="p-6">
+                <div class="flex items-center justify-between mb-3">
+                  <span class={`text-sm font-medium ${style.pillText} ${style.pillBg} px-3 py-1 rounded-full`}>
+                    {post.data.category}
+                  </span>
+                  <span class="text-sm text-gray-500">{post.data.readTime} min read</span>
+                </div>
+
+                <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">
+                  <a href={`/blog/${post.slug}`}>{post.data.title}</a>
+                </h3>
+
+                <p class="text-gray-600 mb-4 line-clamp-3">{post.data.description}</p>
+
+                <div class="flex items-center justify-between">
+                  <time
+                    class="text-sm text-gray-500"
+                    datetime={new Date(post.data.publishedAt).toISOString()}
+                  >
+                    {new Date(post.data.publishedAt).toLocaleDateString("en-GB")}
+                  </time>
+                  <a href={`/blog/${post.slug}`} class="text-blue-600 font-medium hover:text-blue-700 text-sm">
+                    Read More →
+                  </a>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-16">
+          <div class="text-gray-400 text-8xl mb-6">{style.emoji}</div>
+          <h3 class="text-2xl font-semibold text-gray-900 mb-4">No articles found</h3>
+          <p class="text-gray-600 mb-8 text-lg">We haven't published any articles in this category yet.</p>
+          <a
+            href="/blog"
+            class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+          >
+            Browse All Articles
+          </a>
+        </div>
+      )}
+    </section>
+
+    <!-- Ad Slot Bottom (USE NUMERIC SLOT IDs) -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <AdSlot slot="0987654321" height={250} className="my-8" />
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

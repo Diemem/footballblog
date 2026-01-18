@@ -1,0 +1,226 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import AdSlot from "../../components/AdSlot.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("posts");
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+
+const site = Astro.site;
+const postPath = `/blog/${post.slug}`;
+const shareUrl = site ? new URL(postPath, site).toString() : Astro.url.href;
+
+const publishedISO = new Date(post.data.publishedAt).toISOString();
+
+// Related posts (same category, newest first, excluding current post)
+const allPosts = await getCollection("posts");
+const relatedPosts = allPosts
+  .filter((p) => p.data.category === post.data.category && p.slug !== post.slug)
+  .sort(
+    (a, b) =>
+      new Date(b.data.publishedAt).getTime() - new Date(a.data.publishedAt).getTime()
+  )
+  .slice(0, 3);
+
+const imageUrl =
+  site && post.data.featuredImage
+    ? new URL(post.data.featuredImage, site).toString()
+    : undefined;
+---
+
+<Layout
+  title={post.data.title}
+  description={post.data.description}
+  image={post.data.featuredImage}
+  canonical={postPath}
+>
+  <Header />
+
+  {site && (
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        headline: post.data.title,
+        description: post.data.description,
+        datePublished: publishedISO,
+        author: { "@type": "Person", name: post.data.author || "Football Central" },
+        mainEntityOfPage: shareUrl,
+        url: shareUrl,
+        image: imageUrl ? [imageUrl] : undefined,
+      })}
+    />
+  )}
+
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <nav class="mb-8 text-sm">
+      <a href="/" class="text-blue-600 hover:text-blue-700">Home</a>
+      <span class="mx-2 text-gray-500">/</span>
+      <a href="/blog" class="text-blue-600 hover:text-blue-700">Blog</a>
+      <span class="mx-2 text-gray-500">/</span>
+      <span class="text-gray-500">{post.data.title}</span>
+    </nav>
+
+    <article class="bg-white rounded-lg shadow-lg overflow-hidden">
+      <!-- Featured Image -->
+      {post.data.featuredImage && (
+        <img
+          src={post.data.featuredImage}
+          alt={post.data.title}
+          class="w-full h-64 md:h-96 object-cover"
+          loading="eager"
+          decoding="async"
+        />
+      )}
+
+      <div class="p-8">
+        <!-- Meta Info -->
+        <div class="flex flex-wrap items-center gap-4 mb-6 text-sm text-gray-600">
+          <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">
+            {post.data.category}
+          </span>
+
+          <time datetime={publishedISO}>
+            {new Date(post.data.publishedAt).toLocaleDateString("en-GB", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </time>
+
+          <span>By {post.data.author || "Football Central"}</span>
+          <span>{post.data.readTime} min read</span>
+        </div>
+
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
+          {post.data.title}
+        </h1>
+
+        {post.data.tags && (
+          <div class="flex flex-wrap gap-2 mb-8">
+            {post.data.tags.map((tag: string) => (
+              <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <!-- Ad Slot - Top of article (USE NUMERIC SLOT ID) -->
+        <div class="my-8">
+          <AdSlot slot="1234567890" height={250} className="text-center" />
+        </div>
+
+        <div class="prose prose-lg max-w-none">
+          <Content />
+        </div>
+
+        <!-- Ad Slot - Bottom of article (USE NUMERIC SLOT ID) -->
+        <div class="my-8">
+          <AdSlot slot="0987654321" height={250} className="text-center" />
+        </div>
+
+        <!-- Share Buttons -->
+        <div class="border-t border-gray-200 pt-8 mt-8">
+          <h3 class="text-lg font-semibold mb-4">Share this article</h3>
+          <div class="flex gap-4 flex-wrap">
+            <a
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
+                post.data.title
+              )}&url=${encodeURIComponent(shareUrl)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+              aria-label={`Share ${post.data.title} on Twitter`}
+            >
+              Twitter
+            </a>
+
+            <a
+              href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                shareUrl
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition"
+              aria-label={`Share ${post.data.title} on Facebook`}
+            >
+              Facebook
+            </a>
+
+            <a
+              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+                shareUrl
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+              aria-label={`Share ${post.data.title} on LinkedIn`}
+            >
+              LinkedIn
+            </a>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Related Posts -->
+    {relatedPosts.length > 0 && (
+      <section class="mt-16">
+        <h2 class="text-2xl font-bold text-gray-900 mb-8">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {relatedPosts.map((relatedPost) => (
+            <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+              <div class="p-6">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-sm font-medium text-blue-600">
+                    {relatedPost.data.category}
+                  </span>
+                  <span class="text-sm text-gray-500">
+                    {relatedPost.data.readTime} min read
+                  </span>
+                </div>
+
+                <h3 class="text-lg font-bold text-gray-900 mb-3 hover:text-blue-600">
+                  <a href={`/blog/${relatedPost.slug}`}>{relatedPost.data.title}</a>
+                </h3>
+
+                <p class="text-gray-600 mb-4 text-sm">{relatedPost.data.description}</p>
+
+                <div class="flex items-center justify-between">
+                  <time
+                    class="text-sm text-gray-500"
+                    datetime={new Date(relatedPost.data.publishedAt).toISOString()}
+                  >
+                    {new Date(relatedPost.data.publishedAt).toLocaleDateString("en-GB")}
+                  </time>
+
+                  <a
+                    href={`/blog/${relatedPost.slug}`}
+                    class="text-blue-600 font-medium hover:text-blue-700 text-sm"
+                  >
+                    Read More →
+                  </a>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    )}
+  </main>
+
+  <Footer />
+</Layout>

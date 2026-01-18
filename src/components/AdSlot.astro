@@ -1,0 +1,80 @@
+---
+export interface Props {
+  slot: string;
+  className?: string;
+
+  // Optional: only used when ads are enabled
+  height?: number;
+  responsive?: boolean;
+
+  // Optional: show placeholder in dev only (default true)
+  showDevPlaceholder?: boolean;
+}
+
+const {
+  slot,
+  className = "",
+  height = 250,
+  responsive = true,
+  showDevPlaceholder = true,
+} = Astro.props;
+
+// Set this in .env when approved:
+// PUBLIC_ADSENSE_CLIENT=ca-pub-xxxxxxxxxxxx
+const adClient = import.meta.env.PUBLIC_ADSENSE_CLIENT;
+
+// Only run AdSense in production when client is configured
+const enabled = !!adClient && import.meta.env.PROD;
+
+// If production and ads aren't enabled, render nothing (no space)
+if (import.meta.env.PROD && !enabled) {
+  return null;
+}
+---
+
+{enabled ? (
+  <div class={`ad-container ${className}`} style={`min-height:${height}px;`}>
+    <ins
+      class="adsbygoogle"
+      style="display:block"
+      data-ad-client={adClient}
+      data-ad-slot={slot}
+      data-full-width-responsive={responsive ? "true" : "false"}
+      data-ad-format="auto"
+    ></ins>
+
+    <script is:inline>
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+) : (
+  showDevPlaceholder && (
+    <div class={`ad-container ${className}`} style={`min-height:${height}px;`}>
+      <div class="ad-placeholder">
+        <p class="text-sm font-medium text-gray-700">Ad Placeholder (dev only)</p>
+        <p class="text-xs text-gray-500 mt-1">Slot: {slot}</p>
+      </div>
+    </div>
+  )
+)}
+
+<style>
+  .ad-container {
+    width: 100%;
+    margin: 2rem 0;
+  }
+
+  .ad-placeholder {
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    background: rgba(0, 0, 0, 0.04);
+    border: 2px dashed rgba(0, 0, 0, 0.15);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    text-align: center;
+  }
+</style>
